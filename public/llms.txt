@@ -1,0 +1,47 @@
+# Business — Generative Engine Optimization Map
+
+---
+
+## Pages
+
+### בית
+https://example.com
+פיצוחים, ממתקים, תבלינים ושוקולדים איכותיים בגלריית שרון נתניה. קליית אסיף היא היעד שלך לקניות טעימות לכל אירוע ועונה. בואו לגלות!
+
+### סיפור החנות
+https://example.com/store-story
+הכירו את הסיפור מאחורי קליית אסיף — חנות ייחודית עם אווירת שוק מסורתית, מוצרים נבחרים ואהבה אמיתית לאוכל טוב. הסיפור שלנו מתחיל כאן!
+
+### מתנות עונתיות ועולם המוצרים
+https://example.com/seasonal-gifts
+מארזי חגים מרהיבים עם פיצוחים, ממתקים, שוקולדים ופירות יבשים לט&quot;ו בשבט. מתנות עונתיות שמרגשות כל מקבל — הזמינו עוד היום ותפתיעו את כולם!
+
+### ביקור וצור קשר
+https://example.com/contact
+קליית אסיף ממוקמת בגלריית שרון נתניה ופתוחה ראשון עד שישי. בואו לטעום, לבחור ולהתרשם ממגוון הפיצוחים, התבלינים והממתקים שלנו. נשמח לראותכם!
+
+## Legal & Policy
+
+### Privacy Policy
+https://example.com/privacy
+Information about how user data is collected, stored, and protected.
+
+### Terms & Conditions
+https://example.com/terms
+Legal terms describing service usage, rights, and policies.
+
+### Accessibility Statement
+https://example.com/accessibility
+Information about WCAG compliance and accessibility features.
+
+---
+
+# Business Context (for LLM understanding)
+
+## About Business
+---
+
+# Additional Resources
+
+- **Sitemap**: https://example.com/sitemap.xml
+- **Robots.txt**: https://example.com/robots.txt

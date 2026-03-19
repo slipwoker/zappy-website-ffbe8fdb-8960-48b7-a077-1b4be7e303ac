@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <title>מסורת של טעם ואיכות — קליית אסיף</title>
+    <meta name="description" content="הכירו את הסיפור מאחורי קליית אסיף — חנות ייחודית עם אווירת שוק מסורתית, מוצרים נבחרים ואהבה אמיתית לאוכל טוב. הסיפור שלנו מתחיל כאן!">
+    <meta name="keywords" content="קליית אסיף, חנות פיצוחים ותבלינים, אווירת שוק מסורתי, מוצרי מזון איכותיים">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon-512x512.png">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <!-- Zappy Analytics -->
+<script>
+(function() {
+  'use strict';
+  
+  // Configuration
+  var config = {
+    websiteId: 'ffbe8fdb-8960-48b7-a077-1b4be7e303ac',
+    apiUrl: 'https://api.zappy5.com/api/analytics/track',
+    sessionDuration: 30 * 60 * 1000, // 30 minutes
+    visitorDuration: 30 * 24 * 60 * 60 * 1000, // 30 days
+    trackPageViews: true,
+    trackClicks: true,
+    trackFormSubmissions: true
+  };
+  
+  // Generate or retrieve persistent visitor ID (30 days)
+  function getVisitorId() {
+    var visitorKey = 'zappy_visitor_' + config.websiteId;
+    var visitor = null;
+    
+    try {
+      visitor = localStorage.getItem(visitorKey);
+      if (visitor) {
+        var visitorData = JSON.parse(visitor);
+        var now = Date.now();
+        
+        // Check if visitor ID is still valid (30 days)
+        if (now - visitorData.created < config.visitorDuration) {
+          // Update last seen timestamp
+          visitorData.lastSeen = now;
+          localStorage.setItem(visitorKey, JSON.stringify(visitorData));
+          return visitorData.id;
+        }
+      }
+    } catch (e) {
+      console.warn('Zappy Analytics: LocalStorage not available');
+    }
+    
+    // Generate new visitor ID
+    var newVisitorId = 'zv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
+    try {
+      localStorage.setItem(visitorKey, JSON.stringify({
+        id: newVisitorId,
+        created: Date.now(),
+        lastSeen: Date.now()
+      }));
+    } catch (e) {
+      // Continue without local storage
+    }
+    
+    return newVisitorId;
+  }
+  
+  // Generate or retrieve session ID (30 minutes)
+  function getSessionId() {
+    var sessionKey = 'zappy_session_' + config.websiteId;
+    var session = null;
+    
+    try {
+      session = sessionStorage.getItem(sessionKey);
+      if (session) {
+        var sessionData = JSON.parse(session);
+        var now = Date.now();
+        
+        // Check if session is still valid
+        if (now - sessionData.timestamp < config.sessionDuration) {
+          // Update timestamp
+          sessionData.timestamp = now;
+          sessionStorage.setItem(sessionKey, JSON.stringify(sessionData));
+          return sessionData.id;
+        }
+      }
+    } catch (e) {
+      console.warn('Zappy Analytics: SessionStorage not available');
+    }
+    
+    // Generate new session ID
+    var newSessionId = 'zs_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
+    try {
+      sessionStorage.setItem(sessionKey, JSON.stringify({
+        id: newSessionId,
+        timestamp: Date.now()
+      }));
+    } catch (e) {
+      // Continue without session storage
+    }
+    
+    return newSessionId;
+  }
+  
+  var visitorId = getVisitorId();
+  var sessionId = getSessionId();
+  
+  // Track an event
+  function trackEvent(eventType, data) {
+    data = data || {};
+    
+    var eventData = {
+      website_id: config.websiteId,
+      event_type: eventType,
+      page_path: window.location.pathname,
+      referrer: document.referrer || 'direct',
+      visitor_id: visitorId,
+      session_id: sessionId,
+      metadata: data
+    };
+    
+    // Use sendBeacon if available (better for page unload events)
+    if (navigator.sendBeacon) {
+      var blob = new Blob([JSON.stringify(eventData)], { type: 'application/json' });
+      navigator.sendBeacon(config.apiUrl, blob);
+    } else {
+      // Fallback to fetch
+      fetch(config.apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(eventData),
+        keepalive: true
+      }).catch(function(error) {
+        console.warn('Zappy Analytics: Failed to track event', error);
+      });
+    }
+  }
+  
+  // Track page view
+  if (config.trackPageViews) {
+    trackEvent('pageview', {
+      title: document.title,
+      url: window.location.href
+    });
+  }
+  
+  // Track clicks on important elements
+  if (config.trackClicks) {
+    document.addEventListener('click', function(e) {
+      var target = e.target;
+      
+      // Track button clicks (counted as actions)
+      if (target.tagName === 'BUTTON' || target.closest('button')) {
+        var button = target.tagName === 'BUTTON' ? target : target.closest('button');
+        trackEvent('click', {
+          element: 'button',
+          text: button.textContent.trim().substring(0, 100),
+          id: button.id || null,
+          class: button.className || null
+        });
+      }
+      
+      // Track link clicks (navigation - not counted as actions)
+      else if (target.tagName === 'A' || target.closest('a')) {
+        var link = target.tagName === 'A' ? target : target.closest('a');
+        trackEvent('navigation', {
+          element: 'link',
+          text: link.textContent.trim().substring(0, 100),
+          href: link.href,
+          external: link.hostname !== window.location.hostname
+        });
+      }
+    }, true);
+  }
+  
+  // Track form submissions
+  if (config.trackFormSubmissions) {
+    document.addEventListener('submit', function(e) {
+      var form = e.target;
+      
+      trackEvent('form_submit', {
+        form_id: form.id || null,
+        form_name: form.name || null,
+        form_action: form.action || null,
+        form_method: form.method || 'GET'
+      });
+    }, true);
+  }
+  
+  // Track time on page (send on page unload)
+  var pageLoadTime = Date.now();
+  
+  window.addEventListener('beforeunload', function() {
+    var timeOnPage = Math.floor((Date.now() - pageLoadTime) / 1000); // in seconds
+    
+    trackEvent('page_unload', {
+      time_on_page: timeOnPage,
+      page_path: window.location.pathname
+    });
+  });
+  
+  // Expose tracking function globally for custom events
+  window.zappyAnalytics = {
+    track: trackEvent,
+    getVisitorId: function() { return visitorId; },
+    getSessionId: function() { return sessionId; }
+  };
+  
+})();
+</script>
+<!-- End Zappy Analytics -->
+    <meta property="og:title" content="מסורת של טעם ואיכות — קליית אסיף">
+  <meta property="og:description" content="הכירו את הסיפור מאחורי קליית אסיף — חנות ייחודית עם אווירת שוק מסורתית, מוצרים נבחרים ואהבה אמיתית לאוכל טוב. הסיפור שלנו מתחיל כאן!">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="he_IL">
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="מסורת של טעם ואיכות — קליית אסיף">
+  <meta name="twitter:description" content="הכירו את הסיפור מאחורי קליית אסיף — חנות ייחודית עם אווירת שוק מסורתית, מוצרים נבחרים ואהבה אמיתית לאוכל טוב. הסיפור שלנו מתחיל כאן!">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon-512x512.png">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <!-- Cookie Consent -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3/dist/cookieconsent.css">
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3/dist/cookieconsent.umd.js"></script>
+    <!-- Mickidum Accessibility Toolbar -->
+    <script src="https://cdn.jsdelivr.net/gh/mickidum/acc_toolbar/acctoolbar/acctoolbar.min.js"></script>
+    <link rel="stylesheet" href="/styles.css">
+
+    <style id="zappy-dropdown-submenu-styles">
+      /* ========== DESKTOP DROPDOWN SUBMENU STYLES ========== */
+      /* Base styles for dropdown submenus - parent must be positioned */
+      .nav-menu li:has(.sub-menu), nav li:has(.sub-menu), .navbar li:has(.sub-menu), #navMenu li:has(.sub-menu) { position: relative; }
+      /* Submenu base - hidden by default */
+      .nav-menu .sub-menu, nav .sub-menu, .navbar .sub-menu, #navMenu .sub-menu { display: block !important; position: absolute !important; top: 100%; left: 0; min-width: 220px; background: white; border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); padding: 8px 0; opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.3s ease; z-index: 1000; list-style: none; pointer-events: none; }
+      /* CRITICAL: Desktop hover styles to show dropdown */
+      .nav-menu li:hover > .sub-menu, nav li:hover > .sub-menu, .navbar li:hover > .sub-menu, #navMenu li:hover > .sub-menu { opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; pointer-events: auto !important; }
+      /* Submenu item styling */
+      .sub-menu li { list-style: none; margin: 0; padding: 0; }
+      .sub-menu a { display: block !important; padding: 10px 16px !important; color: var(--text-dark, #333) !important; font-weight: 500; text-decoration: none; white-space: nowrap; transition: background-color 0.2s; }
+      .sub-menu a:hover { background-color: #f5f5f5; }
+      /* RTL (Hebrew/Arabic) dropdown positioning */
+      [dir="rtl"] .nav-menu .sub-menu, [dir="rtl"] nav .sub-menu, [dir="rtl"] .navbar .sub-menu, html[lang="he"] .nav-menu .sub-menu, html[lang="he"] nav .sub-menu, html[lang="he"] .navbar .sub-menu, html[lang="ar"] .nav-menu .sub-menu, html[lang="ar"] nav .sub-menu, html[lang="ar"] .navbar .sub-menu { left: auto !important; right: 0 !important; }
+      /* Hide empty dropdown menus */
+      .sub-menu:empty, .sub-menu:not(:has(li:not(.zappy-hidden-menu-item))), .sub-menu:not(:has(li)) { display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
+      /* Desktop: show submenu on Menu Group hover */
+      li:has(.menu-group-title):hover > .sub-menu { opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; pointer-events: auto !important; }
+      /* Menu Group title styling */
+      .nav-menu > li > .menu-group-title, #navMenu > li > .menu-group-title { display: inline-block; padding: 0.5rem 1rem; cursor: default; user-select: none; }
+      
+      /* ========== MOBILE SUBMENU STYLES ========== */
+      @media (max-width: 768px) {
+        .nav-menu .sub-menu, nav .sub-menu, .navbar .sub-menu, #navMenu .sub-menu { position: static !important; transform: none !important; box-shadow: none !important; background: transparent !important; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.3s ease, opacity 0.3s ease; padding: 0 !important; border-radius: 0 !important; }
+        .sub-menu.mobile-expanded { max-height: 500px !important; opacity: 1 !important; visibility: visible !important; padding: 8px 0 8px 16px !important; }
+        [dir="rtl"] .sub-menu.mobile-expanded, html[lang="he"] .sub-menu.mobile-expanded { padding: 8px 16px 8px 0 !important; }
+        /* Disable hover behavior on mobile */
+        .nav-menu li:hover > .sub-menu, nav li:hover > .sub-menu, .navbar li:hover > .sub-menu, #navMenu li:hover > .sub-menu { opacity: 0; visibility: hidden; pointer-events: none; }
+        .nav-menu li > .sub-menu.mobile-expanded, nav li > .sub-menu.mobile-expanded, .navbar li > .sub-menu.mobile-expanded, #navMenu li > .sub-menu.mobile-expanded { opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; }
+        .nav-menu li:has(.sub-menu), nav li:has(.sub-menu), .navbar li:has(.sub-menu), #navMenu li:has(.sub-menu) { display: flex !important; flex-wrap: wrap !important; align-items: center !important; position: relative !important; min-height: 44px !important; }
+        .nav-menu li:has(.sub-menu) > a, nav li:has(.sub-menu) > a, .navbar li:has(.sub-menu) > a, #navMenu li:has(.sub-menu) > a { flex: 1 !important; min-width: 0 !important; }
+        .nav-menu li:has(.sub-menu) > .menu-group-title, nav li:has(.sub-menu) > .menu-group-title, .navbar li:has(.sub-menu) > .menu-group-title, #navMenu li:has(.sub-menu) > .menu-group-title { flex: 1 !important; min-width: 0 !important; padding: 0 !important; line-height: inherit !important; }
+        .nav-menu li:has(.sub-menu) > .sub-menu, nav li:has(.sub-menu) > .sub-menu, .navbar li:has(.sub-menu) > .sub-menu, #navMenu li:has(.sub-menu) > .sub-menu { flex-basis: 100% !important; width: 100% !important; }
+        .nav-menu li:has(.sub-menu) > a [class*="chevron"], .nav-menu li:has(.sub-menu) > a [class*="arrow"], .nav-menu li:has(.sub-menu) > a .fa-chevron-down, .nav-menu li:has(.sub-menu) > a .fa-angle-down, nav li:has(.sub-menu) > a [class*="chevron"], nav li:has(.sub-menu) > a [class*="arrow"], #navMenu li:has(.sub-menu) > a [class*="chevron"], #navMenu li:has(.sub-menu) > a [class*="arrow"] { display: none !important; visibility: hidden !important; }
+        .mobile-submenu-toggle { display: flex !important; align-items: center !important; justify-content: center !important; width: 44px !important; height: auto !important; background: transparent !important; border: none !important; cursor: pointer !important; color: var(--text-dark) !important; position: static !important; flex-shrink: 0 !important; align-self: stretch !important; z-index: 2 !important; padding: 0 !important; margin: 0 !important; }
+        .mobile-submenu-toggle::after { content: '' !important; width: 0 !important; height: 0 !important; border-left: 6px solid transparent !important; border-right: 6px solid transparent !important; border-top: 7px solid currentColor !important; transition: transform 0.3s ease !important; }
+        .mobile-submenu-toggle.expanded::after { transform: rotate(180deg) !important; }
+        .sub-menu a { padding: 10px 0 !important; display: block !important; color: var(--text-dark) !important; }
+        .navbar .sub-menu li a, nav.navbar .sub-menu li a, .zappy-products-dropdown .sub-menu a { color: var(--text-dark) !important; }
+      }
+      @media (min-width: 769px) { .mobile-submenu-toggle { display: none !important; } }
+    </style>
+
+    <style id="mobile-lang-menu-deployed-css">
+    @media (max-width: 768px) {
+      .lang-switcher,
+      .nav-cta-container .lang-switcher,
+      .nav-container .lang-switcher,
+      .navbar .lang-switcher,
+      .navbar .nav-cta-container .lang-switcher,
+      .nav-icons-left .lang-switcher,
+      .nav-ecommerce-icons .lang-switcher { display: none !important; }
+      .mobile-lang-menu { width: 100%; border-top: 1px solid rgba(128,128,128,0.2); padding: 8px 0 0 0; margin-top: 8px; }
+      .mobile-lang-toggle { display: flex !important; align-items: center; justify-content: space-between; width: 100%; padding: 12px 16px; background: none; border: none; cursor: pointer; font-size: 15px; color: inherit; font-family: inherit; }
+      .mobile-lang-toggle::after { content: ''; display: inline-block; width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform 0.3s ease; margin-left: 8px; }
+      .mobile-lang-toggle.expanded::after { transform: rotate(-135deg); }
+      .mobile-lang-options { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+      .mobile-lang-options.expanded { max-height: 300px; }
+      .mobile-lang-option { display: flex !important; align-items: center; gap: 10px; padding: 10px 24px; text-decoration: none; color: inherit; font-size: 14px; font-family: inherit; }
+      .mobile-lang-option:hover { background: rgba(128,128,128,0.1); }
+      .mobile-lang-option.active { font-weight: 600; opacity: 0.7; pointer-events: none; }
+      .mobile-lang-option img { width: 20px; height: 20px; border-radius: 50%; }
+    }
+    @media (min-width: 769px) {
+      .mobile-lang-menu { display: none !important; }
+    }
+    </style>
+
+    <style id="zappy-widget-visibility">
+      #mic-access-tool-general-button, .mic-access-tool-general-button,
+      #mic-init-access-tool .mic-access-tool-general-button, #mic-init-access-tool #mic-access-tool-general-button,
+      ._access-icon, #mic-access-tool-box, .mic-access-tool-box,
+      #mic-init-access-tool #mic-access-tool-box, div[id*="mic-access-tool-box"], ._access-menu {
+        display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important;
+      }
+    </style>
+</head>
+<body>
+
+  <nav class="navbar" dir="rtl">
+  <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+    <svg class="hamburger-icon" width="24" height="24" viewbox="0 0 24 24" fill="none">
+      <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+    </svg>
+    <svg class="close-icon" width="24" height="24" viewbox="0 0 24 24" fill="none" style="display: none;">
+      <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+    </svg>
+  </button>
+
+  <button class="phone-header-btn" data-phone="[business_phone]" aria-label="Call">
+    <svg width="20" height="20" viewbox="0 0 24 24" fill="currentColor">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+    </svg>
+  </button>
+
+  <div class="nav-container">
+    <div class="nav-right-group"><div class="nav-brand">
+      <a href="/" class="logo-link">
+        <img src="/assets/logo.webp" alt="קליית אסיף" class="logo">
+      </a>
+    </div><ul class="nav-menu" id="navMenu"><li><a href="/store-story">סיפור החנות</a></li><li><a href="/seasonal-gifts">מתנות עונתיות ועולם המוצרים</a></li></ul></div>
+
+    
+
+    <div class="nav-cta-container">
+      <a href="/contact" class="nav-cta-btn">ביקור וצור קשר</a>
+    </div>
+  </div>
+</nav>
+<script>
+
+// Navbar Mobile Menu Toggle and Contrast Fix
+(function() {
+  // Use 'load' event instead of 'DOMContentLoaded' to ensure we run AFTER all other scripts
+  window.addEventListener('load', function() {
+    
+    // FIX MOBILE BUTTON CONTRAST
+    // Detect navbar background color and apply contrasting color to mobile buttons
+    const navbar = document.querySelector('.navbar, nav, header');
+    if (!navbar) {
+      console.log('[Navbar] Navbar element not found');
+      return;
+    }
+    
+    // DECLARE VARIABLES EARLY to avoid Temporal Dead Zone errors
+    // These are used in multiple places below
+    let mobileToggle = document.getElementById('mobileToggle') ||
+                       document.querySelector('.mobile-toggle') ||
+                       document.querySelector('.hamburger') ||
+                       document.querySelector('.hamburger-menu') ||
+                       document.querySelector('.menu-toggle') ||
+                       document.querySelector('.burger-menu') ||
+                       document.querySelector('[aria-label="Menu"]') ||
+                       document.querySelector('[aria-label="תפריט"]');
+    
+    const phoneBtn = document.querySelector('.phone-header-btn');
+    
+    const computedStyle = window.getComputedStyle(navbar);
+    let bgColor = computedStyle.backgroundColor;
+    
+    console.log('[Navbar] Initial navbar background:', bgColor);
+    
+    // Check if background is transparent or rgba with 0 alpha
+    const isTransparent = bgColor === 'transparent' || 
+                         bgColor === 'rgba(0, 0, 0, 0)' ||
+                         (bgColor.startsWith('rgba') && bgColor.includes(', 0)'));
+    
+    if (isTransparent) {
+      // Check for background-image or gradient
+      const bgImage = computedStyle.backgroundImage;
+      if (bgImage && bgImage !== 'none') {
+        console.log('[Navbar] Navbar has background image/gradient, using dark text');
+        bgColor = 'rgb(240, 240, 240)'; // Assume light background
+      } else {
+        // Transparent navbar - check body background
+        const bodyBg = window.getComputedStyle(document.body).backgroundColor;
+        console.log('[Navbar] Navbar transparent, using body background:', bodyBg);
+        bgColor = bodyBg;
+      }
+    }
+    
+    // Calculate luminance to determine if background is light or dark
+    const rgb = bgColor.match(/\d+/g);
+    if (rgb && rgb.length >= 3) {
+      const r = parseInt(rgb[0]);
+      const g = parseInt(rgb[1]);
+      const b = parseInt(rgb[2]);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      
+      // Mobile button colors are set by Claude's AI-generated CSS (same as .nav-menu a)
+      // No dynamic color overrides needed - colors come from the generated navbar CSS
+      console.log('[Navbar] Mobile button colors preserved from Claude CSS (luminance:', luminance.toFixed(2) + ')');
+      
+      // FIX ICON SIZES - Ensure SVGs are properly sized and visible
+      // INJECT CRITICAL CSS TO OVERRIDE ANY CONFLICTING RULES
+      const criticalCSS = document.createElement('style');
+      criticalCSS.id = 'zappy-mobile-nav-fix';
+      const htmlLang = document.documentElement.lang || 'en';
+      const htmlDir = document.documentElement.dir || 'ltr';
+      // Check both dir attribute AND lang for RTL detection
+      // dir="rtl" is the most reliable indicator
+      const isRTL = htmlDir === 'rtl' || htmlLang === 'he' || htmlLang === 'ar';
+      
+      criticalCSS.textContent = `
+        /* Hide mobile buttons on desktop, show only on mobile */
+        @media (min-width: 769px) {
+          .mobile-toggle,
+          .phone-header-btn {
+            display: none !important;
+          }
+        }
+        
+        /* Show and position mobile buttons correctly on mobile */
+        @media (max-width: 768px) {
+          .mobile-toggle,
+          .phone-header-btn {
+            position: absolute !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            z-index: 1001 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 50% !important;
+            border: none !important;
+            cursor: pointer !important;
+            padding: 6px !important;
+            background: none !important;
+            color: var(--nav-text, var(--text-dark)) !important;
+          }
+          
+          /* LTR positioning (default): hamburger LEFT, phone RIGHT */
+          html:not([dir="rtl"]):not([lang="he"]):not([lang="ar"]) .mobile-toggle,
+          html[dir="ltr"] .mobile-toggle {
+            left: 12px !important;
+            right: auto !important;
+          }
+          html:not([dir="rtl"]):not([lang="he"]):not([lang="ar"]) .phone-header-btn,
+          html[dir="ltr"] .phone-header-btn {
+            right: 12px !important;
+            left: auto !important;
+          }
+          
+          /* RTL positioning: hamburger RIGHT, phone LEFT */
+          html[dir="rtl"] .mobile-toggle,
+          html[lang="he"] .mobile-toggle,
+          html[lang="ar"] .mobile-toggle {
+            right: 12px !important;
+            left: auto !important;
+          }
+          html[dir="rtl"] .phone-header-btn,
+          html[lang="he"] .phone-header-btn,
+          html[lang="ar"] .phone-header-btn {
+            left: 12px !important;
+            right: auto !important;
+          }
+          
+          /* CRITICAL: Ensure nav-container has min-height on mobile */
+          /* All children are positioned absolutely/fixed on mobile, so height:auto collapses to 0 */
+          .nav-container {
+            min-height: 70px !important;
+            position: relative !important;
+          }
+          
+          /* Ensure SVG icons are properly sized and inherit color */
+          .mobile-toggle svg,
+          .phone-header-btn svg {
+            width: 24px !important;
+            height: 24px !important;
+            /* Don't force display - let JavaScript control hamburger/close toggle */
+          }
+          
+          /* Reset nav-cta-container on mobile - remove desktop box-shadow/padding */
+          /* that creates a visible ghost box when CTA button is hidden */
+          .nav-cta-container {
+            box-shadow: none !important;
+            padding: 0 !important;
+          }
+          
+          /* Hide nav-cta-container entirely on mobile when there's no lang-switcher */
+          /* (only the CTA button is inside, and it's hidden on mobile) */
+          .nav-cta-container:not(:has(.lang-switcher)) {
+            display: none !important;
+          }
+          
+          /* CRITICAL: Prevent hero image fade gradient from bleeding over headline text */
+          /* The .image-fade-gradient has bottom: -30px (extends below parent) */
+          /* On mobile stacked layout, this overlaps the h1 text below the image */
+          .hero-image-column {
+            overflow: hidden !important;
+          }
+          .image-fade-gradient {
+            bottom: 0 !important;
+          }
+          
+          /* Hide desktop language switcher on mobile - hamburger menu handles it */
+          /* High specificity to override stored CSS */
+          .lang-switcher,
+          .nav-cta-container .lang-switcher,
+          .nav-container .lang-switcher,
+          .navbar .lang-switcher,
+          .navbar .nav-cta-container .lang-switcher {
+            display: none !important;
+          }
+        }
+      `;
+      
+      // Remove existing fix if present and inject new one
+      const existing = document.getElementById('zappy-mobile-nav-fix');
+      if (existing) existing.remove();
+      document.head.appendChild(criticalCSS);
+      
+      console.log('[Navbar] Critical CSS injected for mobile nav positioning');
+      
+      // ONLY apply inline positioning styles on mobile viewport
+      // On desktop, the CSS handles hiding these buttons with display: none
+      // Inline styles were breaking desktop layout by overriding CSS
+      const isMobileViewport = window.innerWidth <= 768;
+      
+      if (mobileToggle) {
+        // Icon sizing applies to all viewports for consistency
+        const hamburgerIcon = mobileToggle.querySelector('.hamburger-icon');
+        const closeIcon = mobileToggle.querySelector('.close-icon');
+        
+        if (hamburgerIcon) {
+          hamburgerIcon.style.setProperty('width', '24px', 'important');
+          hamburgerIcon.style.setProperty('height', '24px', 'important');
+          hamburgerIcon.style.setProperty('display', 'block', 'important'); // Show hamburger by default
+        }
+        if (closeIcon) {
+          closeIcon.style.setProperty('width', '24px', 'important');
+          closeIcon.style.setProperty('height', '24px', 'important');
+          closeIcon.style.setProperty('display', 'none', 'important'); // Hide close icon by default
+        }
+        
+        // ONLY set positioning inline styles on mobile
+        if (isMobileViewport) {
+          mobileToggle.style.setProperty('position', 'absolute', 'important');
+          mobileToggle.style.setProperty('top', '50%', 'important');
+          mobileToggle.style.setProperty('transform', 'translateY(-50%)', 'important');
+          mobileToggle.style.setProperty('z-index', '1001', 'important');
+          
+          // Clear any inline left/right so CSS can take over based on html[dir]
+          mobileToggle.style.removeProperty('left');
+          mobileToggle.style.removeProperty('right');
+          
+          console.log('[Navbar] Mobile toggle positioning applied (mobile viewport)');
+        } else {
+          // On desktop, clear any positioning styles to let CSS handle it
+          mobileToggle.style.removeProperty('position');
+          mobileToggle.style.removeProperty('top');
+          mobileToggle.style.removeProperty('transform');
+          mobileToggle.style.removeProperty('z-index');
+          mobileToggle.style.removeProperty('left');
+          mobileToggle.style.removeProperty('right');
+          console.log('[Navbar] Desktop viewport - cleared mobile toggle inline positioning');
+        }
+      }
+      
+      if (phoneBtn) {
+        // Icon sizing applies to all viewports
+        const phoneIcon = phoneBtn.querySelector('svg');
+        if (phoneIcon) {
+          phoneIcon.style.width = '24px';
+          phoneIcon.style.height = '24px';
+          phoneIcon.setAttribute('width', '24');
+          phoneIcon.setAttribute('height', '24');
+        }
+        
+        // ONLY set positioning inline styles on mobile
+        if (isMobileViewport) {
+          phoneBtn.style.setProperty('position', 'absolute', 'important');
+          phoneBtn.style.setProperty('top', '50%', 'important');
+          phoneBtn.style.setProperty('transform', 'translateY(-50%)', 'important');
+          phoneBtn.style.setProperty('z-index', '1001', 'important');
+          
+          // Clear any inline left/right so CSS can take over based on html[dir]
+          phoneBtn.style.removeProperty('left');
+          phoneBtn.style.removeProperty('right');
+          
+          console.log('[Navbar] Phone button positioning applied (mobile viewport)');
+        } else {
+          // On desktop, clear any positioning styles to let CSS handle it
+          phoneBtn.style.removeProperty('position');
+          phoneBtn.style.removeProperty('top');
+          phoneBtn.style.removeProperty('transform');
+          phoneBtn.style.removeProperty('z-index');
+          phoneBtn.style.removeProperty('left');
+          phoneBtn.style.removeProperty('right');
+          console.log('[Navbar] Desktop viewport - cleared phone button inline positioning');
+        }
+      }
+    } else {
+      console.log('[Navbar] Could not parse background color:', bgColor);
+    }
+    
+    // MOBILE MENU TOGGLE
+    // Re-query in case DOM changed (mobileToggle already declared at top of function)
+    mobileToggle = document.getElementById('mobileToggle') ||
+                   document.querySelector('.mobile-toggle') ||
+                   document.querySelector('.hamburger') ||
+                   document.querySelector('.hamburger-menu') ||
+                   document.querySelector('.menu-toggle') ||
+                   document.querySelector('.burger-menu') ||
+                   document.querySelector('[aria-label="Menu"]') ||
+                   document.querySelector('[aria-label="תפריט"]');
+    
+    // EXPANDED SEARCH: Find nav menu by ID or class
+    const navMenu = document.getElementById('navMenu') ||
+                  document.querySelector('.nav-menu') ||
+                  document.querySelector('.nav-links') ||
+                  document.querySelector('nav ul:not(.submenu)');
+    
+    if (!mobileToggle || !navMenu) {
+      console.log('[Navbar] Mobile toggle or menu not found:', { toggle: !!mobileToggle, menu: !!navMenu });
+      return;
+    }
+    
+    // Ensure navMenu has ID for CSS targeting
+    if (!navMenu.id) {
+      navMenu.id = 'navMenu';
+    }
+    
+    console.log('[Navbar] Initializing mobile menu...');
+    
+    // Remove any existing event listeners by cloning the button
+    const newToggle = mobileToggle.cloneNode(true);
+    mobileToggle.parentNode.replaceChild(newToggle, mobileToggle);
+    
+    // Toggle menu on button click - use newToggle now
+    newToggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const hamburgerIcon = this.querySelector('.hamburger-icon');
+      const closeIcon = this.querySelector('.close-icon');
+      const isActive = navMenu.classList.contains('active');
+      
+      if (isActive) {
+        // Close menu
+        navMenu.classList.remove('active');
+        if (hamburgerIcon) hamburgerIcon.style.setProperty('display', 'block', 'important');
+        if (closeIcon) closeIcon.style.setProperty('display', 'none', 'important');
+        document.body.style.overflow = '';
+        console.log('[Navbar] Menu closed');
+      } else {
+        // Open menu
+        navMenu.classList.add('active');
+        if (hamburgerIcon) hamburgerIcon.style.setProperty('display', 'none', 'important');
+        if (closeIcon) closeIcon.style.setProperty('display', 'block', 'important');
+        document.body.style.overflow = 'hidden';
+        console.log('[Navbar] Menu opened');
+      }
+    });
+    
+    // Close menu when clicking nav links (but NOT dropdown toggles)
+    const navLinks = navMenu.querySelectorAll('a');
+    navLinks.forEach(function(link) {
+      link.addEventListener('click', function() {
+        // Don't close if it's a dropdown child (unless it's a real navigation link)
+        if (this.getAttribute('href') === '#') return;
+        
+        const hamburgerIcon = newToggle.querySelector('.hamburger-icon');
+        const closeIcon = newToggle.querySelector('.close-icon');
+        
+        navMenu.classList.remove('active');
+        if (hamburgerIcon) hamburgerIcon.style.setProperty('display', 'block', 'important');
+        if (closeIcon) closeIcon.style.setProperty('display', 'none', 'important');
+        document.body.style.overflow = '';
+        console.log('[Navbar] Menu closed (link clicked)');
+      });
+    });
+    
+    // DROPDOWN MENU TOGGLE (for mobile and touch devices)
+    var dropdownToggles = navMenu.querySelectorAll('.dropdown-toggle');
+    dropdownToggles.forEach(function(toggle) {
+      toggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var parent = this.closest('.nav-dropdown');
+        if (!parent) return;
+        
+        // Close other open dropdowns at the same level
+        var siblings = parent.parentNode.querySelectorAll('.nav-dropdown.open');
+        siblings.forEach(function(sib) {
+          if (sib !== parent) sib.classList.remove('open');
+        });
+        
+        parent.classList.toggle('open');
+        console.log('[Navbar] Dropdown toggled:', parent.classList.contains('open') ? 'open' : 'closed');
+      });
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.nav-dropdown')) {
+        var openDropdowns = document.querySelectorAll('.nav-dropdown.open');
+        openDropdowns.forEach(function(dd) { dd.classList.remove('open'); });
+      }
+    });
+    
+    console.log('[Navbar] Dropdown handlers initialized for ' + dropdownToggles.length + ' dropdowns');
+    
+    // Phone button functionality (phoneBtn already declared at top of function)
+    if (phoneBtn) {
+      phoneBtn.addEventListener('click', function() {
+        // Get phone number from placeholder in page or use default
+        const phoneLinks = document.querySelectorAll('a[href^="tel:"]');
+        const phoneNumber = phoneLinks.length > 0 
+          ? phoneLinks[0].getAttribute('href').replace('tel:', '')
+          : '[business_phone]';
+        
+        window.location.href = 'tel:' + phoneNumber;
+        console.log('[Navbar] Phone button clicked');
+      });
+    }
+    
+    console.log('[Navbar] Mobile menu initialized successfully');
+    
+    // === WHATSAPP BUTTON VISIBILITY FIX ===
+    // Ensure WhatsApp floating button is hidden on desktop and visible on mobile
+    // IMPORTANT: Only target the floating button by its class, NOT generic wa.me links
+    const handleWhatsAppVisibility = function() {
+      const whatsappBtn = document.querySelector('.whatsapp-float');
+      if (whatsappBtn) {
+        const isDesktop = window.innerWidth >= 769;
+        if (isDesktop) {
+          whatsappBtn.style.setProperty('display', 'none', 'important');
+          whatsappBtn.style.setProperty('visibility', 'hidden', 'important');
+          whatsappBtn.style.setProperty('opacity', '0', 'important');
+          whatsappBtn.style.setProperty('pointer-events', 'none', 'important');
+          console.log('[WhatsApp] Button hidden on desktop');
+        } else {
+          whatsappBtn.style.removeProperty('display');
+          whatsappBtn.style.removeProperty('visibility');
+          whatsappBtn.style.removeProperty('opacity');
+          whatsappBtn.style.removeProperty('pointer-events');
+          console.log('[WhatsApp] Button visible on mobile');
+        }
+      }
+    };
+    
+    // Run on load
+    handleWhatsAppVisibility();
+    
+    // Run on resize with debouncing
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(handleWhatsAppVisibility, 100);
+    });
+  });
+})();
+
+</script>
+  
+  <main>
+    <section class="store-story-intro-section" data-layout-spec="סיפור החנות-intro" dir="rtl">
+  <div class="ssio-container">
+    <div class="ssio-grid">
+
+      <!-- TEXT COLUMN (START = RIGHT in RTL) -->
+      <div class="ssio-text-col">
+        <span class="ssio-eyebrow">גלריית שרון, נתניה</span>
+        <h1 class="ssio-h1">קליית אסיף –<br><em>שפע שמגיע<br>מהלב</em></h1>
+        <p class="ssio-lead">קליית אסיף היא יעד קולינרי ייחודי בגלריית שרון בנתניה. כאן תמצאו מבחר עשיר של פיצוחים, גרעינים, תבלינים, ממתקים, שוקולדים ופירות יבשים — כולם נבחרים ביד אמן ומוגשים באהבה לכל לקוח.</p>
+
+        <div class="ssio-divider-line"></div>
+
+        <h3 class="ssio-h3">אווירת שוק מסורתית,<br>איכות שאין עליה עוררין</h3>
+        <p class="ssio-body">כשנכנסים לחנות, מיד חשים את חום השוק המסורתי — ריח התבלינים באוויר, מגשים עמוסים בפיצוחים טריים, ומארזי חגים מפנקים שממתינים לכל אירוע. <strong>חנות פיצוחים ותבלינים</strong> כמו קליית אסיף היא הרבה יותר מסתם חנות — היא חוויה.</p>
+
+        <a href="#contact" class="ssio-cta btn-primary">בואו לבקר אותנו</a>
+      </div>
+
+      <!-- IMAGE COLUMN (END = LEFT in RTL) -->
+      <div class="ssio-image-col">
+        <div class="ssio-image-frame">
+          <div class="ssio-paper-backplate"></div>
+          <figure class="ssio-figure">
+            <img data-placeholder="store-story-intro-image-1" data-context="A tall portrait-oriented documentary-style photograph of the interior of a specialty Middle Eastern food store in an Israeli mall. Shelves overflowing with colorful dried fruits, nuts in wooden bins, glass jars of spices, holiday gift packages wrapped in cellophane, and rows of chocolates. Warm golden lighting, rich textures, abundance and warmth. Traditional market feel with modern retail display. Photographic, editorial quality." width="560" height="760" src="/assets/site-store-story-intro-image-1.webp" alt="תצוגת מוצרי קליית אסיף – פיצוחים, תבלינים ומארזי חגים בגלריית שרון נתניה">
+          </figure>
+          <div class="ssio-image-tag">מאז 2010 • גלריית שרון</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BOTTOM PAPER-RIP DIVIDER -->
+  <div class="ssio-divider-wrapper">
+    <svg data-no-icon-edit="true" aria-hidden="true" viewbox="0 0 1440 90" preserveaspectratio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,90 L0,38 Q24,30 48,42 T96,34 Q130,40 160,28 T230,36 Q270,30 310,42 T380,32 Q420,38 460,26 T540,34 Q580,28 620,40 T700,30 Q740,36 780,24 T860,34 Q900,28 940,40 T1020,30 Q1060,38 1100,26 T1180,34 Q1220,28 1260,40 T1340,32 Q1380,38 1410,30 L1440,34 L1440,90 Z" fill="#2E160F" opacity="0.95"></path>
+      <path d="M0,90 L0,50 Q30,44 60,56 T120,46 Q160,52 200,40 T280,48 Q320,42 360,54 T440,44 Q480,50 520,38 T600,46 Q640,40 680,52 T760,42 Q800,48 840,36 T920,46 Q960,40 1000,52 T1080,42 Q1120,48 1160,36 T1240,44 Q1280,38 1320,50 T1400,40 L1440,44 L1440,90 Z" fill="#2E160F" opacity="0.7"></path>
+      <path d="M0,90 L0,62 Q36,56 72,68 T144,58 Q180,64 216,52 T288,62 Q324,56 360,68 T432,58 Q468,64 504,52 T576,62 Q612,56 648,68 T720,58 Q756,64 792,52 T864,62 Q900,56 936,68 T1008,58 Q1044,64 1080,72 T1152,62 Q1188,68 1224,56 T1296,66 Q1332,60 1368,72 L1440,66 L1440,90 Z" fill="#2E160F"></path>
+    </svg>
+  </div>
+
+</section>
+
+<section class="store-story-story-section" data-layout-spec="סיפור החנות-story" dir="rtl">
+  <div class="story-container">
+    <!-- Image Column (Start/Right in RTL) -->
+    <div class="story-images-col">
+      <figure class="story-img-wrapper story-img-top">
+        <img data-placeholder="store-story-story-image-1" data-context="Warm overhead shot of an abundant display of mixed nuts, dried fruits, and seeds in wooden bowls and open burlap sacks at a specialty Middle Eastern market stall, rich textures, warm amber lighting, intimate market atmosphere, deep brown and golden tones" width="480" height="560" src="/assets/site-store-story-story-image-1.webp" alt="מגוון אגוזים, פירות יבשים וזרעים בחנות קליית אסיף">
+        <div class="img-glow-overlay"></div>
+      </figure>
+      <figure class="story-img-wrapper story-img-bottom">
+        <img data-placeholder="store-story-story-image-2" data-context="Close-up macro photograph of colorful aromatic spices, whole dried chilies, turmeric, paprika, cumin and coriander seeds arranged in rustic clay bowls on a dark wooden surface, warm dramatic side lighting highlighting textures and vivid colors" width="480" height="380" src="/assets/site-store-story-story-image-2.webp" alt="תבלינים ריחניים ועשבי תיבול בחנות קליית אסיף">
+        <div class="img-glow-overlay"></div>
+      </figure>
+    </div>
+
+    <!-- Text Column (End/Left in RTL) -->
+    <div class="story-text-col">
+      <span class="story-eyebrow">הסיפור שלנו</span>
+      <h2 class="story-heading">מהשוק הישן<br>אל הלב שלכם</h2>
+
+      <p class="story-body">ב<strong>קליית אסיף</strong> אנחנו מאמינים שכל גרגר, כל אגוז וכל תבלין טומן בחובו סיפור. מתוך אהבה עמוקה לאוכל אמיתי, אספנו מבחר שוקת עשיר של פיצוחים, זרעים ופירות יבשים שנבחרו בקפידה — מהמקורות הטובים ביותר, עם תשומת לב לאיכות שאי אפשר להתפשר עליה.</p>
+
+      <p class="story-body">ארומת התבלינים שלנו תמלא את המטבח שלכם בחיים. מתערובות קארי עשירות ועד פפריקה מעושנת, כל תבלין נבחר על ידינו אישית כדי שהבישול שלכם יהיה חוויה אמיתית ולא רק שגרה. לצד זה, שוקולדים עדינים, ממתקים מסורתיים ומשקאות קפה קר ושייקים קרים מחכים לכם בכל ביקור.</p>
+
+      <div class="story-divider-line"></div>
+
+      <h3 class="story-subheading">עונות של שפע</h3>
+
+      <p class="story-body">החנות שלנו חיה לפי קצב השנה. לקראת חג, אנחנו מכינים <strong>מארזי חגים פיצוחים וממתקים</strong> שמרגשים כל מי שמקבל אותם — מארזים שמספרים על טעם, על אכפתיות ועל חגיגה. לט"ו בשבט תמצאו מגוון מיוחד של פירות יבשים ואגוזים שמחברים אותנו לאדמה ולעונות. בכל ביקור תגלו משהו חדש, כי <strong>חנות פיצוחים ותבלינים</strong> אמיתית לא עומדת מלכת — היא מתחדשת תמיד.</p>
+    </div>
+  </div>
+
+  <!-- Bottom SVG Divider -->
+  <div class="story-divider-wrapper">
+    <svg data-no-icon-edit="true" aria-hidden="true" viewbox="0 0 1200 90" preserveaspectratio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,90 L0,52 Q60,38 140,50 Q220,62 320,40 Q400,24 500,44 Q580,58 680,36 Q760,20 860,42 Q940,56 1040,34 Q1120,18 1200,46 L1200,90 Z" fill="var(--bg-light)"></path>
+    </svg>
+  </div>
+</section>
+
+<section class="store-story-categories-section" data-layout-spec="סיפור החנות-categories" dir="rtl">
+  <!-- Image Strip -->
+  <div class="ssc-image-strip">
+    <figure class="ssc-strip-item">
+      <img data-placeholder="store-story-categories-image-1" data-context="Close-up macro photography of mixed nuts and seeds — almonds, walnuts, pistachios, sunflower seeds — arranged in rustic wooden bowls on a warm parchment-toned surface, warm natural lighting, specialty food store aesthetic" width="400" height="160" src="/assets/site-store-story-categories-image-1.webp" alt="אגוזים וגרעינים מגוונים בקליית אסיף">
+    </figure>
+    <figure class="ssc-strip-item">
+      <img data-placeholder="store-story-categories-image-2" data-context="Overhead flat-lay of colorful dried fruits and spices — dried apricots, cranberries, raisins, cinnamon sticks, turmeric, paprika — arranged on a warm beige linen surface, editorial food photography style for a specialty market" width="400" height="160" src="/assets/site-store-story-categories-image-2.webp" alt="פירות יבשים ותבלינים בקליית אסיף">
+    </figure>
+    <figure class="ssc-strip-item">
+      <img data-placeholder="store-story-categories-image-3" data-context="Elegant holiday gift packages and chocolate assortments wrapped in kraft paper and ribbon, alongside colorful candies in glass jars, warm festive atmosphere, specialty food store in Israeli mall setting" width="400" height="160" src="/assets/site-store-story-categories-image-3.webp" alt="מארזי חגים שוקולד וממתקים בקליית אסיף">
+    </figure>
+  </div>
+
+  <!-- Section Header -->
+  <div class="ssc-container">
+    <header class="ssc-header">
+      <h2 class="ssc-title">קטגוריות המוצרים שלנו</h2>
+      <p class="ssc-subtitle">בקליית אסיף תמצאו מגוון עשיר של מוצרי מזון איכותיים — מפיצוחים ותבלינים ועד ממתקים, שוקולד ומארזי חגים מיוחדים. כל קטגוריה נבחרה בקפידה כדי להעניק לכם חוויית קנייה מהנה ומגוונת.</p>
+    </header>
+
+    <!-- Category Grid -->
+    <div class="ssc-grid">
+
+      <article class="ssc-card">
+        <div class="ssc-card-icon">
+          <svg data-element-type="icon" data-icon-type="svg" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 48 48" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <ellipse cx="24" cy="30" rx="16" ry="10"></ellipse>
+            <path d="M8 30 Q12 14 24 12 Q36 14 40 30"></path>
+            <circle cx="18" cy="26" r="2" fill="currentColor" stroke="none"></circle>
+            <circle cx="24" cy="24" r="2" fill="currentColor" stroke="none"></circle>
+            <circle cx="30" cy="26" r="2" fill="currentColor" stroke="none"></circle>
+          </svg>
+        </div>
+        <div class="ssc-card-body">
+          <h3 class="ssc-card-title">פיצוחים וגרעינים</h3>
+          <p class="ssc-card-text">שקדים, אגוזי מלך, פיסטוקים, גרעיני חמנייה ועוד — כולם טריים, קלויים ומתובלים בידי אומנים. מושלמים לנשנוש יומיומי ולאירועים מיוחדים.</p>
+        </div>
+      </article>
+
+      <article class="ssc-card">
+        <div class="ssc-card-icon">
+          <svg data-element-type="icon" data-icon-type="svg" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 48 48" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 36 L14 20 Q14 10 24 10 Q34 10 34 20 L34 36 Z"></path>
+            <line x1="14" y1="24" x2="34" y2="24"></line>
+            <line x1="20" y1="10" x2="20" y2="8"></line>
+            <line x1="28" y1="10" x2="28" y2="8"></line>
+            <line x1="10" y1="36" x2="38" y2="36"></line>
+          </svg>
+        </div>
+        <div class="ssc-card-body">
+          <h3 class="ssc-card-title">תבלינים ועשבי תיבול</h3>
+          <p class="ssc-card-text">מבחר עשיר של תבלינים טריים ואיכותיים מרחבי העולם — פפריקה, כורכום, זעתר, קינמון ועשרות תבלינים נוספים שיהפכו כל ארוחה לחוויה.</p>
+        </div>
+      </article>
+
+      <article class="ssc-card">
+        <div class="ssc-card-icon">
+          <svg data-element-type="icon" data-icon-type="svg" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 48 48" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="12" y="18" width="24" height="20" rx="3"></rect>
+            <path d="M18 18 Q18 10 24 10 Q30 10 30 18"></path>
+            <circle cx="24" cy="28" r="3" fill="currentColor" stroke="none"></circle>
+            <line x1="24" y1="31" x2="24" y2="34"></line>
+          </svg>
+        </div>
+        <div class="ssc-card-body">
+          <h3 class="ssc-card-title">ממתקים ושוקולד</h3>
+          <p class="ssc-card-text">ממתקים צבעוניים, שוקולדים משובחים ועוגיות ביתיות — מגוון מתוק שמשמח ילדים ומבוגרים כאחד. בחרו מהמדפים המלאים שלנו בחנות פיצוחים ותבלינים.</p>
+        </div>
+      </article>
+
+      <article class="ssc-card">
+        <div class="ssc-card-icon">
+          <svg data-element-type="icon" data-icon-type="svg" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 48 48" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M16 38 L16 20 Q16 14 24 14 Q32 14 32 20 L32 38 Z"></path>
+            <path d="M32 22 Q38 22 38 28 Q38 34 32 34"></path>
+            <line x1="12" y1="38" x2="36" y2="38"></line>
+            <path d="M20 14 Q20 8 24 8 Q28 8 28 14"></path>
+          </svg>
+        </div>
+        <div class="ssc-card-body">
+          <h3 class="ssc-card-title">משקאות וקפה קר</h3>
+          <p class="ssc-card-text">שייקים קרים, קפה קר ביתי, סלאשי קרח מרענן וגרסאות מיוחדות לעונות השנה — הנאה נוזלית לכל גיל ולכל מצב רוח.</p>
+        </div>
+      </article>
+
+      <article class="ssc-card">
+        <div class="ssc-card-icon">
+          <svg data-element-type="icon" data-icon-type="svg" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 48 48" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="24" cy="26" r="14"></circle>
+            <path d="M18 22 Q20 16 24 14 Q28 16 30 22"></path>
+            <path d="M20 26 Q22 30 24 30 Q26 30 28 26"></path>
+            <path d="M24 12 L24 8"></path>
+            <path d="M14 16 L11 13"></path>
+            <path d="M34 16 L37 13"></path>
+          </svg>
+        </div>
+        <div class="ssc-card-body">
+          <h3 class="ssc-card-title">פירות יבשים לט"ו בשבט</h3>
+          <p class="ssc-card-text">תאנים, תמרים, משמשים, שזיפים ועוד עשרות סוגי פירות יבשים — מגוון מיוחד לחגיגת ט"ו בשבט ולמתנות עונתיות מרגשות.</p>
+        </div>
+      </article>
+
+      <article class="ssc-card">
+        <div class="ssc-card-icon">
+          <svg data-element-type="icon" data-icon-type="svg" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 48 48" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="10" y="20" width="28" height="18" rx="2"></rect>
+            <path d="M16 20 L16 16 Q16 10 24 10 Q32 10 32 16 L32 20"></path>
+            <line x1="10" y1="28" x2="38" y2="28"></line>
+            <path d="M19 24 L19 32"></path>
+            <path d="M24 24 L24 32"></path>
+            <path d="M29 24 L29 32"></path>
+          </svg>
+        </div>
+        <div class="ssc-card-body">
+          <h3 class="ssc-card-title">מארזי חגים פיצוחים וממתקים</h3>
+          <p class="ssc-card-text">מארזי מתנה מרהיבים לראש השנה, פסח, פורים וכל חג — מאורזים בטעם ובסטייל, מתאימים לעסקים, משפחות וחברים יקרים.</p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+
+  <!-- Bottom Diagonal Divider -->
+  <div class="ssc-divider-wrapper">
+    <svg data-no-icon-edit="true" aria-hidden="true" viewbox="0 0 1200 90" preserveaspectratio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,90 L0,55 L1200,10 L1200,90 Z" fill="#3A1D13"></path>
+    </svg>
+  </div>
+</section>
+
+<section class="store-story-process-section" data-layout-spec="סיפור החנות-process" dir="rtl">
+  <!-- Botanical corner accents -->
+  <div class="ssps-botanical ssps-botanical--tr" aria-hidden="true">
+    <svg data-no-icon-edit="true" aria-hidden="true" viewbox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M100,10 Q80,30 60,25 Q40,20 30,50 Q20,80 10,100" stroke="rgba(126,142,47,0.35)" stroke-width="1.5" fill="none"></path>
+      <path d="M110,20 Q95,45 75,40 Q55,35 45,60" stroke="rgba(126,142,47,0.25)" stroke-width="1" fill="none"></path>
+      <ellipse cx="60" cy="25" rx="8" ry="5" fill="rgba(126,142,47,0.18)" transform="rotate(-20 60 25)"></ellipse>
+      <ellipse cx="30" cy="50" rx="7" ry="4" fill="rgba(126,142,47,0.15)" transform="rotate(15 30 50)"></ellipse>
+      <ellipse cx="75" cy="40" rx="6" ry="3.5" fill="rgba(126,142,47,0.12)" transform="rotate(-10 75 40)"></ellipse>
+    </svg>
+  </div>
+  <div class="ssps-botanical ssps-botanical--bl" aria-hidden="true">
+    <svg data-no-icon-edit="true" aria-hidden="true" viewbox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20,110 Q40,90 60,95 Q80,100 90,70 Q100,40 110,20" stroke="rgba(126,142,47,0.3)" stroke-width="1.5" fill="none"></path>
+      <path d="M10,100 Q25,75 45,80 Q65,85 75,60" stroke="rgba(126,142,47,0.2)" stroke-width="1" fill="none"></path>
+      <ellipse cx="60" cy="95" rx="8" ry="5" fill="rgba(126,142,47,0.15)" transform="rotate(20 60 95)"></ellipse>
+      <ellipse cx="90" cy="70" rx="7" ry="4" fill="rgba(126,142,47,0.12)" transform="rotate(-15 90 70)"></ellipse>
+    </svg>
+  </div>
+
+  <div class="ssps-container">
+    <!-- Section Header -->
+    <div class="ssps-header">
+      <h2 class="ssps-title">האמנות שמאחורי כל מוצר</h2>
+      <p class="ssps-subtitle">ב<strong>קליית אסיף</strong>, כל מה שמגיע למדף עובר תהליך קפדני של בחירה, עיצוב ואהבה — כדי שתקבלו רק את הטוב ביותר.</p>
+    </div>
+
+    <!-- Three Steps -->
+    <div class="ssps-steps">
+
+      <!-- Step 1 -->
+      <article class="ssps-step">
+        <div class="ssps-step-number" aria-hidden="true">01</div>
+        <div class="ssps-step-icon" aria-hidden="true">
+          <svg data-element-type="icon" data-icon-type="svg" viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="44" height="44">
+            <circle cx="24" cy="24" r="20" stroke="rgba(242,197,109,0.4)" stroke-width="1"></circle>
+            <path d="M24 10 C24 10 14 18 14 26 C14 31.5 18.5 36 24 36 C29.5 36 34 31.5 34 26 C34 18 24 10 24 10Z" stroke="currentColor" stroke-width="1.5" fill="none"></path>
+            <path d="M24 36 L24 42" stroke="currentColor" stroke-width="1.5"></path>
+            <path d="M20 30 Q24 26 28 30" stroke="currentColor" stroke-width="1.2" fill="none"></path>
+            <path d="M17 22 Q20 19 24 20" stroke="currentColor" stroke-width="1" fill="none"></path>
+          </svg>
+        </div>
+        <div class="ssps-step-content">
+          <h3 class="ssps-step-title">מיון ובחירת המיטב</h3>
+          <p class="ssps-step-desc">אנחנו בוחרים בעצמנו כל אגוז, תבלין וממתק — ישירות מספקים מובחרים. רק מוצרים שעומדים בסטנדרט הטעם והאיכות שלנו מוצאים את דרכם לחנות.</p>
+        </div>
+      </article>
+
+      <!-- Divider -->
+      <div class="ssps-divider" aria-hidden="true"></div>
+
+      <!-- Step 2 -->
+      <article class="ssps-step">
+        <div class="ssps-step-number" aria-hidden="true">02</div>
+        <div class="ssps-step-icon" aria-hidden="true">
+          <svg data-element-type="icon" data-icon-type="svg" viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="44" height="44">
+            <circle cx="24" cy="24" r="20" stroke="rgba(242,197,109,0.4)" stroke-width="1"></circle>
+            <rect x="12" y="16" width="24" height="18" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"></rect>
+            <path d="M12 22 L36 22" stroke="currentColor" stroke-width="1.2"></path>
+            <path d="M18 28 L22 28" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            <path d="M18 32 L28 32" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path>
+            <path d="M20 16 L20 12 M28 16 L28 12" stroke="currentColor" stroke-width="1.2"></path>
+          </svg>
+        </div>
+        <div class="ssps-step-content">
+          <h3 class="ssps-step-title">הצגה שמזמינה לטעום</h3>
+          <p class="ssps-step-desc">כל מוצר מוצג בצורה שמדברת לחושים — ניחוחות, צבעים ומרקמים שנבחרו בקפידה. הסדר במדפים אינו מקרי; הוא מסע חושי מתוכנן.</p>
+        </div>
+      </article>
+
+      <!-- Divider -->
+      <div class="ssps-divider" aria-hidden="true"></div>
+
+      <!-- Step 3 -->
+      <article class="ssps-step">
+        <div class="ssps-step-number" aria-hidden="true">03</div>
+        <div class="ssps-step-icon" aria-hidden="true">
+          <svg data-element-type="icon" data-icon-type="svg" viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="44" height="44">
+            <circle cx="24" cy="24" r="20" stroke="rgba(242,197,109,0.4)" stroke-width="1"></circle>
+            <path d="M16 30 L16 20 Q16 14 24 14 Q32 14 32 20 L32 30" stroke="currentColor" stroke-width="1.5" fill="none"></path>
+            <rect x="13" y="29" width="22" height="8" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"></rect>
+            <path d="M20 22 Q24 20 28 22" stroke="currentColor" stroke-width="1.2" fill="none"></path>
+            <path d="M22 26 L26 26" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <div class="ssps-step-content">
+          <h3 class="ssps-step-title">מארזי חגים בעבודת יד</h3>
+          <p class="ssps-step-desc">לכל עונה ולכל חג אנו מרכיבים מארזי חגים פיצוחים וממתקים בהתאמה אישית — מט"ו בשבט ועד ראש השנה — עם תשומת לב לכל פרט ולכל שכבה.</p>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- Footer Trust Line -->
+    <p class="ssps-trust-line">כי אצלנו, כל פרט קטן הוא חלק מהאהבה שאנחנו שמים בכל מוצר.</p>
+  </div>
+</section>
+  </main>
+  
+  <footer class="site-footer"><div class="footer-top"><div class="footer-container"><div class="footer-grid"><div class="footer-col footer-brand"><img src="/assets/logo.webp" alt="קליית אסיף" class="logo"><p class="footer-tagline">טעמים אותנטיים, מוצרים איכותיים ישירות אליך</p><div class="footer-social"><a href="[facebook_handle]" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a><a href="[instagram_handle]" aria-label="Instagram"><i class="fab fa-instagram"></i></a><a href="[whatsapp_handle]" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a></div></div><div class="footer-col footer-links"><h3 class="footer-heading">ניווט מהיר</h3><ul><li><a href="/store-story">סיפור החנות</a></li><li><a href="/seasonal-gifts">מתנות עונתיות ועולם המוצרים</a></li><li><a href="/contact">ביקור וצור קשר</a></li></ul></div><div class="footer-col footer-contact"><h3 class="footer-heading">צור קשר</h3><ul class="contact-list"><li><i class="fas fa-envelope"></i><a href="mailto:[business_email]">[business_email]</a></li><li><i class="fas fa-phone"></i><a href="tel:[business_phone]">[business_phone]</a></li><li><a href="/"><i class="fas fa-map-marker-alt"></i><span>[business_address]</span></a></li></ul></div><div class="footer-col footer-extra"><h3 class="footer-heading">שעות פעילות</h3><p class="hours-text">ראשון – חמישי<br><strong>09:00 – 19:00</strong></p><p class="hours-text">שישי<br><strong>09:00 – 14:00</strong></p><div class="footer-badge"><i class="fas fa-leaf"></i><span>מוצרים טריים ואיכותיים</span></div></div></div></div></div><div class="footer-bottom"><div class="footer-container"><div class="footer-bottom-inner"><p class="footer-copy">© 2026 קליית אסיף. כל הזכויות שמורות.</p><div class="footer-legal"><a href="/privacy">מדיניות פרטיות</a><span class="divider">|</span><a href="/terms">תנאי שימוש</a><span class="divider">|</span><a href="/accessibility">נגישות</a><span class="divider">|</span><a href="https://zappy5.com" target="_blank" class="zappy-attribution">נוצר באמצעות Zappy</a></div></div></div></div></footer>
+  
+  <a href="https://wa.me/[whatsapp_handle]" class="whatsapp-float" aria-label="WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+  
+  <div data-integration="accessibility:toolbar"></div>
+
+    <script src="/script.js"></script>
+
+    <script id="zappy-mobile-submenu-script">
+    (function() {
+      function initMobileSubmenuToggles() {
+        if (window.innerWidth > 768) {
+          document.querySelectorAll('.mobile-submenu-toggle').forEach(function(btn) { btn.remove(); });
+          document.querySelectorAll('.sub-menu.mobile-expanded').forEach(function(menu) { menu.classList.remove('mobile-expanded'); });
+          return;
+        }
+        var items = document.querySelectorAll('.nav-menu li:has(.sub-menu), nav li:has(.sub-menu), .navbar li:has(.sub-menu), #navMenu li:has(.sub-menu)');
+        items.forEach(function(li) {
+          if (li.querySelector('.mobile-submenu-toggle')) return;
+          var submenu = li.querySelector('.sub-menu');
+          var parentLink = li.querySelector(':scope > a');
+          if (!submenu || !parentLink) return;
+          var toggleBtn = document.createElement('button');
+          toggleBtn.className = 'mobile-submenu-toggle';
+          toggleBtn.setAttribute('aria-label', 'Toggle submenu');
+          toggleBtn.setAttribute('type', 'button');
+          parentLink.insertAdjacentElement('afterend', toggleBtn);
+          toggleBtn.addEventListener('click', function(e) {
+            e.preventDefault(); e.stopPropagation();
+            document.querySelectorAll('.sub-menu.mobile-expanded').forEach(function(menu) {
+              if (menu !== submenu) { menu.classList.remove('mobile-expanded'); var t = menu.parentElement.querySelector('.mobile-submenu-toggle'); if(t) t.classList.remove('expanded'); }
+            });
+            submenu.classList.toggle('mobile-expanded');
+            toggleBtn.classList.toggle('expanded');
+          });
+        });
+      }
+      if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initMobileSubmenuToggles); }
+      else { initMobileSubmenuToggles(); }
+      var resizeTimer; window.addEventListener('resize', function() { clearTimeout(resizeTimer); resizeTimer = setTimeout(initMobileSubmenuToggles, 250); });
+      // Re-initialize when mobile menu becomes visible (MutationObserver)
+      var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes') {
+            var target = mutation.target;
+            if (target.classList && (target.classList.contains('active') || target.classList.contains('open'))) {
+              setTimeout(initMobileSubmenuToggles, 100);
+            }
+          }
+        });
+      });
+      setTimeout(function() {
+        document.querySelectorAll('.mobile-menu, .nav-menu, #navMenu, nav').forEach(function(menu) {
+          observer.observe(menu, { attributes: true, attributeFilter: ['class', 'style'] });
+        });
+      }, 500);
+    })();
+    </script>
+
+    <script id="zappy-mobile-lang-menu-script">
+    (function() {
+      function initMobileLangMenu() {
+        if (window.innerWidth > 768) {
+          var existingMenu = document.querySelector('.mobile-lang-menu');
+          if (existingMenu) existingMenu.remove();
+          return;
+        }
+        if (document.querySelector('.mobile-lang-menu')) return;
+        var switcher = document.querySelector('.lang-switcher');
+        if (!switcher) return;
+        var dropdown = switcher.querySelector('.lang-switcher-dropdown');
+        if (!dropdown) return;
+        var options = dropdown.querySelectorAll('.lang-option');
+        if (options.length === 0) return;
+        var navMenu = document.getElementById('navMenu') || document.querySelector('.nav-menu') || document.querySelector('nav ul');
+        if (!navMenu) return;
+        var currentLang = document.documentElement.lang || 'en';
+        var langConfigs = {
+          he: {name:'עברית',flag:'https://api.iconify.design/circle-flags/il.svg'},
+          en: {name:'English',flag:'https://api.iconify.design/circle-flags/us.svg'},
+          ar: {name:'العربية',flag:'https://api.iconify.design/circle-flags/sa.svg'},
+          fr: {name:'Français',flag:'https://api.iconify.design/circle-flags/fr.svg'},
+          es: {name:'Español',flag:'https://api.iconify.design/circle-flags/es.svg'},
+          de: {name:'Deutsch',flag:'https://api.iconify.design/circle-flags/de.svg'},
+          ru: {name:'Русский',flag:'https://api.iconify.design/circle-flags/ru.svg'},
+          zh: {name:'中文',flag:'https://api.iconify.design/circle-flags/cn.svg'},
+          ja: {name:'日本語',flag:'https://api.iconify.design/circle-flags/jp.svg'},
+          pt: {name:'Português',flag:'https://api.iconify.design/circle-flags/br.svg'},
+          it: {name:'Italiano',flag:'https://api.iconify.design/circle-flags/it.svg'},
+          ko: {name:'한국어',flag:'https://api.iconify.design/circle-flags/kr.svg'}
+        };
+        var container = document.createElement('div');
+        container.className = 'mobile-lang-menu';
+        var currentConfig = langConfigs[currentLang] || {name:currentLang,flag:''};
+        var toggleBtn = document.createElement('button');
+        toggleBtn.className = 'mobile-lang-toggle';
+        toggleBtn.type = 'button';
+        var currentFlagHtml = currentConfig.flag ? '<img src="' + currentConfig.flag + '" width="20" height="20" alt="" style="border-radius:50%;margin-right:8px;margin-left:8px;">' : '';
+        toggleBtn.innerHTML = currentFlagHtml + currentConfig.name;
+        container.appendChild(toggleBtn);
+        var optionsDiv = document.createElement('div');
+        optionsDiv.className = 'mobile-lang-options';
+        var currentLink = document.createElement('a');
+        currentLink.className = 'mobile-lang-option active';
+        currentLink.href = '#';
+        currentLink.innerHTML = currentFlagHtml + currentConfig.name;
+        optionsDiv.appendChild(currentLink);
+        options.forEach(function(opt) {
+          var link = document.createElement('a');
+          link.className = 'mobile-lang-option';
+          link.href = opt.getAttribute('href');
+          link.innerHTML = opt.innerHTML;
+          optionsDiv.appendChild(link);
+        });
+        container.appendChild(optionsDiv);
+        navMenu.appendChild(container);
+        toggleBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleBtn.classList.toggle('expanded');
+          optionsDiv.classList.toggle('expanded');
+        });
+      }
+      if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initMobileLangMenu); }
+      else { initMobileLangMenu(); }
+      window.addEventListener('resize', function() { clearTimeout(window._mlrt); window._mlrt = setTimeout(initMobileLangMenu, 250); });
+    })();
+    </script>
+</body>
+</html>
